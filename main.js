@@ -15,7 +15,7 @@ const leftMenu = document.querySelector('.left-menu'),
     modalLink = document.querySelector('.modal__link'),
     searchForm = document.querySelector('.search__form'),
     searchFormInput = document.querySelector('.search__form-input'),
-    dropdown = document.querySelector('.dropdown'),
+    dropdown = document.querySelectorAll('.dropdown'),
     tvShowsHead = document.querySelector('.tv-shows__head'),
     pagination = document.querySelector('.pagination');
 
@@ -67,7 +67,7 @@ const dbService = new DBService ();
 // Открытие/закрытие меню
 
 const closeDropdown = () => {
-    Object.keys(dropdown).forEach(item => {
+    dropdown.forEach(item => {
         item.classList.remove('active');
     })
 };
@@ -100,7 +100,7 @@ leftMenu.addEventListener('click', event => {
         dbService.getTopRated().then((response) => renderCard(response, target));
     }
     if (target.closest('#popular')) {
-        dbService.getPopular().then((response) => renderCard(response, target));
+        dbService.getPopular().then(renderCard);
     }
     if (target.closest('#week')) {
         dbService.getWeek().then((response) => renderCard(response, target));
@@ -142,7 +142,7 @@ const renderCard = (response, target) => {
                 ${voteElem}
                 <img class="tv-card__img"
                         src="${posterIMG}"
-                        data-backdrop=""
+                        data-backdrop="${backdropIMG}"
                         alt="${title}">
                 <h4 class="tv-card__head">${title}</h4>
             </a>
@@ -151,7 +151,7 @@ const renderCard = (response, target) => {
         tvShowList.append(card);
     })
     pagination.textContent = '';
-    if (target && response.total_pages > 2) {
+    if (target && response.total_pages > 1) {
         for (let i = 1; i <= response.total_pages; i++) {
             pagination.innerHTML += `<li><a href="#" class="page">${i}</a></li>`
         }
