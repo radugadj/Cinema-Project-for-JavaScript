@@ -16,7 +16,8 @@ const leftMenu = document.querySelector('.left-menu'),
     searchForm = document.querySelector('.search__form'),
     searchFormInput = document.querySelector('.search__form-input'),
     dropdown = document.querySelector('.dropdown'),
-    tvShowsHead = document.querySelector('.tv-shows__head')
+    tvShowsHead = document.querySelector('.tv-shows__head'),
+    pagination = document.querySelector('.pagination');
 
 // элемент загрузки
 
@@ -47,19 +48,26 @@ class DBService {
     getTestCard = () => {
         return this.getData('card.json')
     }
-
-    getSearchResult = query => this
-        .getData(`${this.SERVER}/search/tv?api_key=${this.API_KEY}&language=ru-RU&query=${query}`);
-
-
-    getTvShows = id => this
-        .getData(`${this.SERVER}/tv/${id}?api_key=${this.API_KEY}&language=ru-RU`);
+    getSearchResult = query => {
+        this.temp = `${this.SERVER}/search/tv?api_key=${this.API_KEY}&language=ru-RU&query=${query}`;
+    return this.getData(this.temp);
+    }
+    getNextPage = page => {
+        return this.getData(this.temp + '&page=' + page);
+    }
+    getTvShows = id => this.getData(`${this.SERVER}/tv/${id}?api_key=${this.API_KEY}&language=ru-RU`);
+    getTopRated = () => this.getData(`${this.SERVER}/tv/top_rated?api_key=${this.API_KEY}&language=ru-RU`);
+    getPopular = () => this.getData(`${this.SERVER}/tv/popular?api_key=${this.API_KEY}&language=ru-RU`);
+    getToday = () => this.getData(`${this.SERVER}/tv/airing_today?api_key=${this.API_KEY}&language=ru-RU`);
+    getWeek = () => this.getData(`${this.SERVER}/tv/on_the_air?api_key=${this.API_KEY}&language=ru-RU`);
 };
+
+const dbService = new DBService ();
 
 // Открытие/закрытие меню
 
 const closeDropdown = () => {
-    dropdown.forEach(item => {
+    Object.keys(dropdown).forEach(item => {
         item.classList.remove('active');
     })
 };
@@ -88,17 +96,29 @@ leftMenu.addEventListener('click', event => {
         leftMenu.classList.add('openMenu');
         hamburger.classList.add('open');
     }
-})
+    if (target.closest('#top-rated')) {
+        dbService.getTopRated().then((response) => renderCard(response, target));
+    }
+    if (target.closest('#popular')) {
+        dbService.getPopular().then((response) => renderCard(response, target));
+    }
+    if (target.closest('#week')) {
+        dbService.getWeek().then((response) => renderCard(response, target));
+    }
+    if (target.closest('#today')) {
+        dbService.getToday().then((response) => renderCard(response, target));
+    }
+});
 
 // Создание карточки с фильмом
 
-const renderCard = response => {
+const renderCard = (response, target) => {
     tvShowList.textContent = '';
 
     if (!response.total_results) {
         loading.remove();
         tvShowsHead.textContent = 'К сожалению по вашему запросу ни чего не найдено...';
-        tvShowsHead.style.cssText = 'color: rgba(41, 185, 221, 0.922); text-shadow: 2px 8px 6px rgba(0,0,0,0.2), 0px -5px 35px rgba(255,255,255,0.3);'
+        tvShowsHead.style.cssText = 'color: black; text-shadow: 2px 8px 6px rgba(0,0,0,0.2), 0px -5px 35px rgba(255,255,255,0.3);'
         return;
         };
         
@@ -130,6 +150,12 @@ const renderCard = response => {
         loading.remove();
         tvShowList.append(card);
     })
+    pagination.textContent = '';
+    if (target && response.total_pages > 2) {
+        for (let i = 1; i <= response.total_pages; i++) {
+            pagination.innerHTML += `<li><a href="#" class="page">${i}</a></li>`
+        }
+    }
 };
 
 {
@@ -191,6 +217,15 @@ modal.addEventListener('click', event => {
         event.target.classList.contains('modal')) {
         document.body.style.overflow = '';
         modal.classList.add('hide')
+    }
+});
+
+pagination.addEventListener('click', event => {
+    event.preventDefault();
+    const target = event.target;
+    if (target.classList.contains('page')) {
+        tvShows.append(loading);
+        dbService.getNextPage(target.textContent).then(renderCard);
     }
 });
 
