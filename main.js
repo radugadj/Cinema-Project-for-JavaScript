@@ -17,7 +17,7 @@ const leftMenu = document.querySelector('.left-menu'),
     searchFormInput = document.querySelector('.search__form-input'),
     dropdown = document.querySelectorAll('.dropdown'),
     tvShowsHead = document.querySelector('.tv-shows__head'),
-    pagination = document.querySelector('.pagination'),
+    pagination = document.querySelector('.pagination');
 
 // элемент загрузки
 
