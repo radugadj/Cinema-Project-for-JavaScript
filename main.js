@@ -145,7 +145,7 @@ const renderCard = (response, target) => {
                         data-backdrop="${backdropIMG}"
                         alt="${title}">
                 <h4 class="tv-card__head">${title}</h4>
-            </a>
+            </a>     
         `;
         loading.remove();
         tvShowList.append(card);
