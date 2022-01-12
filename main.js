@@ -131,11 +131,9 @@ const renderCard = response => {
         tvShowList.append(card);
     })
 };
+tvShows.append(loading);
+new DBService().getTestData().then(renderCard);
 
-{
-    tvShows.append(loading);
-    new DBService().getTestData().then(renderCard);
-};
 
 // Поиск
 
