@@ -158,10 +158,10 @@ const renderCard = (response, target) => {
     }
 };
 
-{
-    tvShows.append(loading);
-    new DBService().getTestData().then(renderCard);
-};
+
+tvShows.append(loading);
+new DBService().getTestData().then(renderCard);
+
 
 // Поиск
 
